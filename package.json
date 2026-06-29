@@ -1,0 +1,20 @@
+{
+  "name": "zrule",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"bun run dev:server\" \"bun run dev:client\"",
+    "dev:server": "bun --filter @zrule/server dev",
+    "dev:client": "bun --filter @zrule/client dev",
+    "build": "bun --filter @zrule/server build && bun --filter @zrule/client build",
+    "typecheck": "bun --filter @zrule/server typecheck && bun --filter @zrule/client typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}

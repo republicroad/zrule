@@ -1,0 +1,29 @@
+{
+  "name": "@zrule/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "auth:sync": "bunx --bun auth generate"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.8",
+    "@hono/zod-validator": "^0.8.0",
+    "better-auth": "^1.6.22",
+    "drizzle-orm": "^0.40.1",
+    "hono": "^4.7.2",
+    "postgres": "^3.4.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.5",
+    "@types/bun": "^1.2.8",
+    "typescript": "^5.7.3"
+  }
+}
