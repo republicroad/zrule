@@ -98,7 +98,7 @@ zrule/
 
 ### Prerequisites
 - [Bun](https://bun.sh) (latest)
-- [Docker](https://docker.com) (for PostgreSQL)
+- [Podman](https://podman.io) (for PostgreSQL)
 - Node.js 20+ (for some tooling)
 
 ### Setup
@@ -109,7 +109,7 @@ git clone <repo-url> && cd zrule
 bun install
 
 # 2. Start PostgreSQL
-docker compose up -d
+podman compose up -d
 
 # 3. Configure environment
 cp apps/server/.env.example apps/server/.env
@@ -149,7 +149,7 @@ The API runs on `http://localhost:3001` and the React frontend on `http://localh
 
 ### Phase 1 — Scaffold & Database
 - Initialize Bun workspaces (`server` + `client`)
-- Docker Compose for PostgreSQL
+- Podman Compose for PostgreSQL
 - Drizzle configuration and `bun:sql` client
 - Decision models schema (`id`, `name`, `slug`, `org_id`, `graph` JSONB, `version`, timestamps)
 

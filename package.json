@@ -13,6 +13,9 @@
     "build": "bun --filter @zrule/server build && bun --filter @zrule/client build",
     "typecheck": "bun --filter @zrule/server typecheck && bun --filter @zrule/client typecheck"
   },
+  "dependencies": {
+    "better-auth": "^1.6.23"
+  },
   "devDependencies": {
     "concurrently": "^9.1.2",
     "typescript": "^5.7.3"

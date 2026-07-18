@@ -13,4 +13,7 @@ export const auth = betterAuth({
   plugins: [organization()],
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: (process.env.CORS_ORIGINS ?? "http://localhost:5173")
+    .split(",")
+    .map((s) => s.trim()),
 });

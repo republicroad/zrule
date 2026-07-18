@@ -1,0 +1,2 @@
+# Bun configuration for @zrule/server
+# .env loading is handled via --preload=./src/preload.ts in dev script

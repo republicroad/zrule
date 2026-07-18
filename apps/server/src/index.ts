@@ -1,4 +1,3 @@
-import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth } from "./auth/index.ts";
@@ -7,18 +6,27 @@ import decisionsRouter from "./routes/decisions.ts";
 
 const app = new Hono();
 
+const corsOrigins = (process.env.CORS_ORIGINS ?? "http://localhost:5173")
+  .split(",")
+  .map((s) => s.trim());
+
 app.use(
   "/api/*",
   cors({
-    origin: ["http://localhost:5173"],
+    origin: corsOrigins,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   }),
 );
 
-app.on(["POST", "GET"], "/api/auth/**", (c) => {
-  return auth.handler(c.req.raw);
+app.on(["POST", "GET"], "/api/auth/**", async (c) => {
+  try {
+    return await auth.handler(c.req.raw);
+  } catch (err) {
+    console.error("[Auth Error]", err);
+    return c.json({ error: "Internal auth error" }, 500);
+  }
 });
 
 app.use("/api/*", sessionMiddleware);
@@ -30,10 +38,23 @@ app.get("/api/health", (c) => {
 app.route("/api/decisions", decisionsRouter);
 
 const port = Number(process.env.PORT ?? 3001);
+const hostname = process.env.HOST ?? "0.0.0.0";
 
-serve(
-  { fetch: app.fetch, port },
-  (info) => {
-    console.log(`Server running on http://localhost:${info.port}`);
-  },
-);
+if (typeof globalThis.Bun !== "undefined") {
+  Bun.serve({
+    fetch: app.fetch,
+    port,
+    hostname,
+    listening: (server) => {
+      console.log(`Server running on http://${server.hostname}:${server.port}`);
+    },
+  });
+} else {
+  const { serve } = await import("@hono/node-server");
+  serve(
+    { fetch: app.fetch, port, hostname },
+    (info) => {
+      console.log(`Server running on http://${info.address}:${info.port}`);
+    },
+  );
+}
