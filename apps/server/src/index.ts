@@ -41,14 +41,12 @@ const port = Number(process.env.PORT ?? 3001);
 const hostname = process.env.HOST ?? "0.0.0.0";
 
 if (typeof globalThis.Bun !== "undefined") {
-  Bun.serve({
+  const server = Bun.serve({
     fetch: app.fetch,
     port,
     hostname,
-    listening: (server) => {
-      console.log(`Server running on http://${server.hostname}:${server.port}`);
-    },
   });
+  console.log(`Server running on http://${server.hostname}:${server.port}`);
 } else {
   const { serve } = await import("@hono/node-server");
   serve(

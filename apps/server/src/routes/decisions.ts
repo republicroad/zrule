@@ -4,6 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { decisions } from "../db/schema/index.ts";
+import { requireAuth } from "../middleware/auth.ts";
 
 const createDecisionSchema = z.object({
   name: z.string().min(1).max(256),
@@ -25,23 +26,13 @@ const updateDecisionSchema = z.object({
   }).optional(),
 });
 
-const decisionsRouter = new Hono<{
-  Variables: {
-    user: { id: string } | null;
-    session: { activeOrganizationId?: string } | null;
-  };
-}>();
+const decisionsRouter = new Hono();
+
+decisionsRouter.use(requireAuth);
 
 decisionsRouter.get("/", async (c) => {
-  const user = c.get("user");
   const session = c.get("session");
-  if (!user || !session) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-  const orgId = session.activeOrganizationId;
-  if (!orgId) {
-    return c.json({ error: "No active organization" }, 400);
-  }
+  const orgId = session!.activeOrganizationId!;
 
   const list = await db
     .select()
@@ -58,17 +49,10 @@ decisionsRouter.get("/", async (c) => {
 });
 
 decisionsRouter.get("/:id", async (c) => {
-  const user = c.get("user");
   const session = c.get("session");
-  if (!user || !session) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-  const orgId = session.activeOrganizationId;
-  if (!orgId) {
-    return c.json({ error: "No active organization" }, 400);
-  }
-
+  const orgId = session!.activeOrganizationId!;
   const id = c.req.param("id");
+
   const decision = await db
     .select()
     .from(decisions)
@@ -91,13 +75,7 @@ decisionsRouter.get("/:id", async (c) => {
 decisionsRouter.post("/", zValidator("json", createDecisionSchema), async (c) => {
   const user = c.get("user");
   const session = c.get("session");
-  if (!user || !session) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-  const orgId = session.activeOrganizationId;
-  if (!orgId) {
-    return c.json({ error: "No active organization" }, 400);
-  }
+  const orgId = session!.activeOrganizationId!;
 
   const body = c.req.valid("json");
   const decision = await db
@@ -108,7 +86,7 @@ decisionsRouter.post("/", zValidator("json", createDecisionSchema), async (c) =>
       description: body.description ?? null,
       graph: body.graph,
       organizationId: orgId,
-      createdById: user.id,
+      createdById: user!.id,
     })
     .returning()
     .then((rows) => rows[0]);
@@ -117,16 +95,8 @@ decisionsRouter.post("/", zValidator("json", createDecisionSchema), async (c) =>
 });
 
 decisionsRouter.put("/:id", zValidator("json", updateDecisionSchema), async (c) => {
-  const user = c.get("user");
   const session = c.get("session");
-  if (!user || !session) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-  const orgId = session.activeOrganizationId;
-  if (!orgId) {
-    return c.json({ error: "No active organization" }, 400);
-  }
-
+  const orgId = session!.activeOrganizationId!;
   const id = c.req.param("id");
   const body = c.req.valid("json");
 
@@ -160,17 +130,10 @@ decisionsRouter.put("/:id", zValidator("json", updateDecisionSchema), async (c) 
 });
 
 decisionsRouter.delete("/:id", async (c) => {
-  const user = c.get("user");
   const session = c.get("session");
-  if (!user || !session) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-  const orgId = session.activeOrganizationId;
-  if (!orgId) {
-    return c.json({ error: "No active organization" }, 400);
-  }
-
+  const orgId = session!.activeOrganizationId!;
   const id = c.req.param("id");
+
   const existing = await db
     .select()
     .from(decisions)
