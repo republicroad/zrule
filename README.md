@@ -239,6 +239,14 @@ app.use("*", async (c, next) => {
 });
 ```
 
+## reference
+
+### reui skill
+在项目中手动安装 reui skill 文件.
+```bash
+curl -fsSL https://mcp.reui.io/install | bun -
+```
+
 ## License
 
 MIT
