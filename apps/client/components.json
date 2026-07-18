@@ -22,9 +22,6 @@
   "menuColor": "default",
   "menuAccent": "subtle",
   "registries": {
-    "@reui": "https://reui.io/r/{style}/{name}.json"
-  },
-  "registries": {
     "@reui": {
       "url": "https://reui.io/r/{style}/{name}.json",
       "headers": {
