@@ -3,6 +3,8 @@ import { rootRoute } from "./routes/__root";
 import { loginRoute } from "./routes/login";
 import { registerRoute } from "./routes/register";
 import { dashboardRoute } from "./routes/dashboard";
+import { organizationsRoute } from "./routes/organizations";
+import { organizationDetailRoute } from "./routes/organizations.$id";
 import { authClient } from "./lib/auth-client";
 
 const indexRoute = createRoute({
@@ -22,6 +24,8 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   dashboardRoute,
+  organizationsRoute,
+  organizationDetailRoute,
 ]);
 
 export const router = createRouter({

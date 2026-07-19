@@ -1,47 +1,42 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { useSession, signOut } from "@/lib/auth-client";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useSession } from "@/lib/auth-client";
+import { AppShell } from "@/components/blocks/app-shell-1/components/app-shell";
+
+function AuthLayout() {
+  return (
+    <TooltipProvider>
+      <Outlet />
+    </TooltipProvider>
+  );
+}
+
+function AuthenticatedLayout() {
+  return (
+    <TooltipProvider>
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    </TooltipProvider>
+  );
+}
 
 function RootLayout() {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
 
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="mx-auto flex h-14 max-w-screen-xl items-center justify-between px-4">
-          <Link to="/" className="text-lg font-semibold">
-            ZRule
-          </Link>
-          <nav className="flex items-center gap-4">
-            {session ? (
-              <>
-                <span className="text-sm text-muted-foreground">
-                  {session.user.email}
-                </span>
-                <Button variant="ghost" size="sm" onClick={() => signOut()}>
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button size="sm">Sign Up</Button>
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
-      <main className="mx-auto max-w-screen-xl px-4 py-8">
-        <Outlet />
-      </main>
-    </div>
-  );
+  if (isPending) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-background">
+        <div className="text-muted-foreground text-sm">Loading...</div>
+      </div>
+    );
+  }
+
+  if (session) {
+    return <AuthenticatedLayout />;
+  }
+
+  return <AuthLayout />;
 }
 
 export const rootRoute = createRootRoute({
